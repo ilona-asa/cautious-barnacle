@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Cairo's Farm Town!</title>
+    <!-- Pixel Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Press Start 2P', monospace;
+            image-rendering: pixelated;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f7e6c4;
+            background-image: radial-gradient(#dfc59f 2px, transparent 2px);
+            background-size: 32px 32px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            background: #8b5a2b;
+            border: 8px solid #5c3a21;
+            border-radius: 4px;
+            box-shadow: 0 12px 0px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .top-banner {
+            background-color: #2e6f40;
+            border: 4px solid #1a4324;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            box-shadow: inset -4px -4px 0px #1a4324;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px #1a4324;
+        }
+
+        .main-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .screen-left {
+            flex: 1;
+            min-width: 300px;
+            background-color: #7fa644;
+            border: 6px solid #4d6e22;
+            border-radius: 2px;
+            position: relative;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .status-bars {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .bar-container {
+            margin-bottom: 8px;
+        }
+
+        .bar-container:last-child {
+            margin-bottom: 0;
+        }
+
+        .bar-label {
+            color: #fff;
+            font-size: 8px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #333;
+            border: 2px solid #000;
+            padding: 1px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .bar-happy {
+            background-color: #4cd137;
+        }
+
+        .bar-woof {
+            background-color: #e84118;
+        }
+
+        .canvas-area {
+            width: 100%;
+            height: 280px;
+            background-color: #a4cc64;
+            border: 4px solid #4d6e22;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .farm-bg-element {
+            position: absolute;
+            background-color: #8da43c;
+            border-radius: 4px;
+        }
+
+        .avatar-eirene {
+            width: 120px;
+            height: 150px;
+            background-color: #ddd;
+            border: 4px solid #fff;
+            z-index: 2;
+            margin-bottom: 10px;
+            margin-right: 10px;
+            background-image: url('cairo_and_eirene.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar-eirene::after {
+            content: "Eirene";
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            font-size: 8px;
+            padding: 2px 5px;
+        }
+
+        .cairo-character {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .cairo-animated-asset {
+            width: 90px;
+            height: auto;
+            image-rendering: pixelated;
+        }
+
+        .screen-right {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu-title {
+            background-color: #cd7f32;
+            border: 4px solid #8b5a2b;
+            color: #fff;
+            padding: 10px;
+            font-size: 12px;
+            text-align: center;
+            text-shadow: 1px 1px 0px #000;
+        }
+
+        .btn-menu {
+            width: 100%;
+            padding: 15px;
+            font-size: 10px;
+            text-align: left;
+            color: white;
+            border: 4px solid #000;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: inset -4px -4px 0px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.1s;
+        }
+
+        .btn-menu:active {
+            transform: scale(0.98);
+            box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-yellow {
+            background-color: #f1c40f;
+            color: #000;
+            border-color: #f39c12;
+        }
+
+        .btn-green {
+            background-color: #2ecc71;
+            color: #fff;
+            border-color: #27ae60;
+        }
+
+        .btn-red {
+            background-color: #e74c3c;
+            color: #fff;
+            border-color: #c0392b;
+        }
+
+        .btn-blue {
+            background-color: #3498db;
+            color: #fff;
+            border-color: #2980b9;
+        }
+
+        .bottom-status {
+            margin-top: 20px;
+            background: #111;
+            color: #4cd137;
+            padding: 12px;
+            font-size: 10px;
+            display: flex;
+            justify-content: space-between;
+            border: 4px solid #333;
+        }
+
+        /* Dialogue box popups */
+        .dialogue-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .dialogue-box {
+            background: #fff;
+            border: 6px solid #5c3a21;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 0 0 4px #000;
+        }
+
+        .dialogue-text {
+            font-size: 10px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+        .dialogue-close {
+            background: #e74c3c;
+            color: white;
+            border: 2px solid #000;
+            padding: 6px 12px;
+            font-size: 8px;
+            cursor: pointer;
+            float: right;
+            margin-top: 10px;
+        }
+
+        /* Catching Game Styles */
+        #miniGameScreen {
+            display: none;
+            width: 100%;
+            height: 240px;
+            background: #a4cc64;
+            border: 4px solid #000;
+            position: relative;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        #gameCairo {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            width: 60px;
+            transform: translateX(-50%);
+            transition: left 0.05s linear;
+        }
+
+        .falling-item {
+            position: absolute;
+            font-size: 20px;
+            top: -30px;
+            user-select: none;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .ctrl-btn {
+            background: #cd7f32;
+            border: 3px solid #000;
+            color: white;
+            padding: 10px 20px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Leaderboard Screen inside Minigame */
+        #leaderboardScreen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            z-index: 20;
+            padding: 15px;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        #leaderboardScreen h3 {
+            color: #f1c40f;
+            font-size: 14px;
+            margin-top: 0;
+        }
+
+        #leaderboardList {
+            list-style: none;
+            padding: 0;
+            font-size: 10px;
+            line-height: 2;
+            text-align: left;
+            max-width: 200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .score-entry {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #555;
+            padding: 2px 0;
+        }
+
+        /* Confetti Styles */
+        .confetti-particle {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            z-index: 9999;
+            animation: confetti-fall linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Farming Fun / Crop Clicker */
+        #farmingScreen {
+            display: none;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .farming-intro {
+            font-size: 9px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: #000;
+        }
+
+        .crop-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .crop-tile {
+            background: #a4cc64;
+            border: 4px solid #4d6e22;
+            padding: 12px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.15s;
+            position: relative;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .crop-tile:hover {
+            background: #b8dc78;
+            transform: scale(1.05);
+        }
+
+        .crop-tile:active {
+            transform: scale(0.95);
+        }
+
+        .crop-tile.harvested {
+            background: #8b7355;
+            border-color: #5c4a32;
+            opacity: 0.75;
+        }
+
+        .crop-tile.harvested::after {
+            content: "✓";
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 10px;
+            color: #2ecc71;
+        }
+
+        .crop-emoji {
+            font-size: 28px;
+            line-height: 1;
+            user-select: none;
+        }
+
+        .crop-label {
+            font-size: 6px;
+            color: #1a4324;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .farming-progress {
+            font-size: 8px;
+            color: #555;
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        /* Memory Slideshow */
+        #memorySlideshow {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.88);
+            z-index: 30;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .slideshow-box {
+            background: #fff;
+            border: 6px solid #5c3a21;
+            box-shadow: 0 0 0 4px #000;
+            max-width: 560px;
+            width: 100%;
+            padding: 16px;
+            position: relative;
+        }
+
+        .slideshow-title {
+            font-size: 10px;
+            color: #2e6f40;
+            text-align: center;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .slideshow-viewport {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #111;
+            border: 4px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slideshow-viewport img,
+        .slideshow-viewport video {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .slideshow-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            gap: 8px;
+        }
+
+        .slideshow-btn {
+            background: #cd7f32;
+            border: 3px solid #000;
+            color: white;
+            padding: 8px 12px;
+            font-size: 8px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .slideshow-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .slideshow-counter {
+            font-size: 8px;
+            color: #333;
+            flex: 1;
+            text-align: center;
+        }
+
+        .slideshow-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .slideshow-dot {
+            width: 10px;
+            height: 10px;
+            border: 2px solid #000;
+            background: #ccc;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .slideshow-dot.active {
+            background: #2ecc71;
+        }
+
+        .slideshow-close {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: #e74c3c;
+            color: white;
+            border: 3px solid #000;
+            width: 28px;
+            height: 28px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        @media (max-width: 480px) {
+            .crop-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Password Gate */
+        #passwordGate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .password-box {
+            background: #fff;
+            border: 6px solid #5c3a21;
+            box-shadow: 0 0 0 4px #000;
+            padding: 24px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .password-title {
+            font-size: 12px;
+            color: #2e6f40;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .password-subtitle {
+            font-size: 8px;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 10px;
+            border: 4px solid #000;
+            background: #f7e6c4;
+            margin-bottom: 14px;
+            outline: none;
+        }
+
+        .password-input:focus {
+            border-color: #2e6f40;
+        }
+
+        .password-submit {
+            width: 100%;
+            padding: 14px;
+            font-size: 10px;
+            background: #2ecc71;
+            color: #fff;
+            border: 4px solid #27ae60;
+            cursor: pointer;
+            box-shadow: inset -4px -4px 0px rgba(0, 0, 0, 0.3);
+        }
+
+        .password-submit:active {
+            transform: scale(0.98);
+            box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Password Gate -->
+    <div id="passwordGate">
+        <div class="password-box">
+            <div class="password-title">🔒 CAIRO'S FARM TOWN</div>
+            <div class="password-subtitle">This page is private.<br>Enter the password to continue.</div>
+            <input type="password" class="password-input" id="passwordInput" placeholder="Password..." autocomplete="off">
+            <button class="password-submit" onclick="checkPassword()">ENTER FARM</button>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="top-banner">
+            🌾 WELCOME TO CAIRO'S FARM TOWN 🌾
+        </div>
+
+        <div class="main-layout">
+            <div class="screen-left">
+                <div class="status-bars">
+                    <div class="bar-container">
+                        <div class="bar-label"><span>HAPPY:</span><span id="happy-val">50%</span></div>
+                        <div class="bar-bg">
+                            <div class="bar-fill bar-happy" id="happy-bar" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                    <div class="bar-container">
+                        <div class="bar-label"><span>WOOF ENERGY:</span><span id="woof-val">50%</span></div>
+                        <div class="bar-bg">
+                            <div class="bar-fill bar-woof" id="woof-bar" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="canvas-area">
+                    <div class="farm-bg-element" style="width: 80px; height: 40px; top: 20px; left: 20px;"></div>
+                    <div class="farm-bg-element" style="width: 60px; height: 30px; top: 80px; right: 30px;"></div>
+
+                    <div class="character-container cairo-character" id="cairoPet" title="Click Cairo!">
+                        <div class="avatar-eirene" id="eireneAvatar" title="It's Eirene!"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screen-right">
+                <div class="menu-title">GAME MENU</div>
+
+                <button class="btn-menu btn-yellow" onclick="openDialogue('birthday')">
+                    🎂 HAPPY BIRTHDAY, EIRENE!
+                </button>
+
+                <button class="btn-menu btn-green" onclick="openGame()">
+                    🐾 CAIRO'S MINI-ADVENTURE
+                </button>
+
+                <button class="btn-menu btn-red" onclick="openFarmingGame()">
+                    🌽 FARMING FUN: JULY 3RD
+                </button>
+
+                <button class="btn-menu btn-blue" onclick="openDialogue('about')">
+                    ℹ️ ABOUT EIRENE (STATS)
+                </button>
+            </div>
+        </div>
+
+        <div class="bottom-status">
+            <div>LEVEL: BIRTHDAY UNLOCKED!</div>
+            <div>📅 JULY 3</div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="dialogue-overlay" id="dialogueOverlay">
+        <div class="dialogue-box">
+            <div class="dialogue-text" id="dialogueText">Text placeholder...</div>
+
+            <!-- Mini Game Screen -->
+            <div id="miniGameScreen">
+                <div style="position: absolute; top: 5px; left: 5px; font-size: 8px; color: #000; z-index: 5;"
+                    id="scoreBoard">SCORE: 0</div>
+                <div style="position: absolute; top: 5px; right: 5px; font-size: 8px; color: #e74c3c; z-index: 5;"
+                    id="speedBoard">SPD: 1x</div>
+
+                <div id="gameCairo">
+                    <img src="cairo_animation.gif" alt="Animated Cairo the Dog"
+                        style="width: 100%; image-rendering: pixelated;">
+                </div>
+
+                <!-- Leaderboard Screen Overlay -->
+                <div id="leaderboardScreen">
+                    <h3>🏆 HIGH SCORES 🏆</h3>
+                    <ul id="leaderboardList"></ul>
+                    <button class="ctrl-btn" style="background:#2ecc71;" onclick="startNewGame()">PLAY AGAIN</button>
+                </div>
+            </div>
+
+            <div class="game-controls" id="gameControls" style="display: none;">
+                <button class="ctrl-btn" onclick="moveCairoLeft()">◀ LEFT</button>
+                <button class="ctrl-btn" onclick="moveCairoRight()">RIGHT ▶</button>
+            </div>
+
+            <!-- Farming Fun / Crop Clicker -->
+            <div id="farmingScreen">
+                <div class="farming-intro">
+                    🌾 <b>FARMING FUN: JULY 3RD</b> 🌾<br>
+                    Click each crop to harvest a fun memory! Photos &amp; videos with the same name play together in a slideshow.
+                </div>
+                <div class="crop-grid" id="cropGrid"></div>
+                <div class="farming-progress" id="farmingProgress">Memories harvested: 0 / 0</div>
+            </div>
+
+            <button class="dialogue-close" onclick="closeDialogue()">CLOSE WINDOW</button>
+        </div>
+    </div>
+
+    <!-- Memory Slideshow Overlay -->
+    <div id="memorySlideshow">
+        <div class="slideshow-box">
+            <button class="slideshow-close" onclick="closeMemorySlideshow()" title="Close">✕</button>
+            <div class="slideshow-title" id="slideshowTitle">Memory</div>
+            <div class="slideshow-viewport" id="slideshowViewport"></div>
+            <div class="slideshow-nav">
+                <button class="slideshow-btn" id="slideshowPrev" onclick="slideshowPrev()">◀ PREV</button>
+                <span class="slideshow-counter" id="slideshowCounter">1 / 1</span>
+                <button class="slideshow-btn" id="slideshowNext" onclick="slideshowNext()">NEXT ▶</button>
+            </div>
+            <div class="slideshow-dots" id="slideshowDots"></div>
+        </div>
+    </div>
+
+    <script>
+        const CORRECT_PASSWORD = 'AI';
+
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === CORRECT_PASSWORD) {
+                sessionStorage.setItem('eireneFarmAuth', '1');
+                document.getElementById('passwordGate').style.display = 'none';
+            } else {
+                alert('Wrong password! Please ask Eirene for the password.');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') checkPassword();
+        });
+
+        if (sessionStorage.getItem('eireneFarmAuth') === '1') {
+            document.getElementById('passwordGate').style.display = 'none';
+        } else {
+            document.getElementById('passwordInput').focus();
+        }
+
+        const dialogues = {
+            birthday: "✨ HAPPY BIRTHDAY EIRENE! ✨<br><br>Wishing you an amazing year ahead filled with joy, laughter, and endless fun! You are awesome, and Cairo is lucky to have you too! Enjoy your special mini game today!",
+            about: "📊 CHARACTER STATS 📊<br><br>NAME: Eirene Debora Ulina<br>CLASS: Birthday Queen<br>COMPANION: Cairo (The Best Dog)<br>FAVORITE GAMES: Life Simulations<br>LUCK: MAXED OUT 🍀"
+        };
+
+        const MEMORY_ASSET_DIR = 'Photos-3-001';
+
+        // Memories grouped by base name; files sharing a prefix appear in one slideshow
+        const memoryGroups = [
+            {
+                id: 'dufan',
+                title: 'Dufan Adventures',
+                emoji: '🎢',
+                files: ['dufan1.jpg', 'dufan2.jpg', 'dufan3.jpg', 'dufan4.jpg', 'dufan5.jpg', 'dufan5.mp4']
+            },
+            {
+                id: 'first_meet_as_moomoo',
+                title: 'First Meet as Moomoo',
+                emoji: '🐮',
+                files: ['first_meet_as_moomoo.jpg']
+            },
+            {
+                id: 'karaoke_di_kantor',
+                title: 'Karaoke at the Office',
+                emoji: '🎤',
+                files: ['karaoke_di_kantor.mp4']
+            },
+            {
+                id: 'karaoke_di_mobil',
+                title: 'Karaoke in the Car',
+                emoji: '🚗',
+                files: ['karaoke_di_mobil.mp4']
+            },
+            {
+                id: 'mocca-on_the_night_like_this',
+                title: 'Mocca — On the Night Like This',
+                emoji: '🌙',
+                files: ['mocca-on_the_night_like_this.mp4']
+            },
+            {
+                id: 'selfie',
+                title: 'Selfie Season',
+                emoji: '📸',
+                files: ['selfie1.jpg', 'selfie2.jpg', 'selfie3.jpg', 'selfie4.jpg']
+            },
+            {
+                id: 'wall_climbing',
+                title: 'Wall Climbing',
+                emoji: '🧗',
+                files: ['wall_climbing1.jpg']
+            },
+            {
+                id: 'withasa',
+                title: 'With Asa',
+                emoji: '💕',
+                files: ['withAsa1.jpg', 'withAsa2.jpg', 'withAsa3.jpg', 'withAsa4.JPG', 'withasa5.jpg']
+            }
+        ];
+
+        let harvestedMemories = new Set();
+        let slideshowGroup = null;
+        let slideshowIndex = 0;
+
+        function openFarmingGame() {
+            hideGameElements();
+            document.getElementById('dialogueText').style.display = 'none';
+            document.getElementById('farmingScreen').style.display = 'block';
+            document.getElementById('dialogueOverlay').style.display = 'flex';
+            renderCropGrid();
+            updateFarmingProgress();
+        }
+
+        function renderCropGrid() {
+            const grid = document.getElementById('cropGrid');
+            grid.innerHTML = memoryGroups.map((group, index) => {
+                const harvested = harvestedMemories.has(group.id);
+                return `
+                    <div class="crop-tile${harvested ? ' harvested' : ''}"
+                         onclick="harvestCrop('${group.id}')"
+                         title="${group.title}">
+                        <span class="crop-emoji">${group.emoji}</span>
+                        <span class="crop-label">${group.title}</span>
+                    </div>`;
+            }).join('');
+        }
+
+        function updateFarmingProgress() {
+            const total = memoryGroups.length;
+            const count = harvestedMemories.size;
+            const el = document.getElementById('farmingProgress');
+            el.innerText = `Memories harvested: ${count} / ${total}`;
+            if (count === total) {
+                el.innerHTML = `🎉 All ${total} memories harvested! Happy July 3rd! 🌽`;
+                triggerConfetti();
+            }
+        }
+
+        function harvestCrop(groupId) {
+            const group = memoryGroups.find(g => g.id === groupId);
+            if (!group) return;
+
+            harvestedMemories.add(groupId);
+            renderCropGrid();
+            updateFarmingProgress();
+            openMemorySlideshow(group);
+
+            happyEnergy = Math.min(happyEnergy + 5, 100);
+            document.getElementById('happy-bar').style.width = happyEnergy + '%';
+            document.getElementById('happy-val').innerText = happyEnergy + '%';
+        }
+
+        function openMemorySlideshow(group) {
+            slideshowGroup = group;
+            slideshowIndex = 0;
+            document.getElementById('slideshowTitle').innerText = `${group.emoji} ${group.title}`;
+            document.getElementById('memorySlideshow').style.display = 'flex';
+            renderSlideshowSlide();
+            renderSlideshowDots();
+        }
+
+        function closeMemorySlideshow() {
+            const viewport = document.getElementById('slideshowViewport');
+            const media = viewport.querySelector('video');
+            if (media) {
+                media.pause();
+                media.removeAttribute('src');
+            }
+            viewport.innerHTML = '';
+            document.getElementById('memorySlideshow').style.display = 'none';
+            slideshowGroup = null;
+        }
+
+        function renderSlideshowSlide() {
+            if (!slideshowGroup) return;
+
+            const files = slideshowGroup.files;
+            const viewport = document.getElementById('slideshowViewport');
+            const filename = files[slideshowIndex];
+            const src = `${MEMORY_ASSET_DIR}/${filename}`;
+            const ext = filename.split('.').pop().toLowerCase();
+            const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
+
+            viewport.innerHTML = '';
+
+            if (isVideo) {
+                const video = document.createElement('video');
+                video.src = src;
+                video.controls = true;
+                video.autoplay = true;
+                video.playsInline = true;
+                viewport.appendChild(video);
+            } else {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = slideshowGroup.title;
+                viewport.appendChild(img);
+            }
+
+            document.getElementById('slideshowCounter').innerText = `${slideshowIndex + 1} / ${files.length}`;
+            document.getElementById('slideshowPrev').disabled = slideshowIndex === 0;
+            document.getElementById('slideshowNext').disabled = slideshowIndex === files.length - 1;
+
+            document.querySelectorAll('.slideshow-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === slideshowIndex);
+            });
+        }
+
+        function renderSlideshowDots() {
+            if (!slideshowGroup) return;
+            const dotsEl = document.getElementById('slideshowDots');
+            dotsEl.innerHTML = slideshowGroup.files.map((_, i) =>
+                `<button class="slideshow-dot${i === 0 ? ' active' : ''}" onclick="goToSlide(${i})" aria-label="Slide ${i + 1}"></button>`
+            ).join('');
+        }
+
+        function goToSlide(index) {
+            if (!slideshowGroup || index < 0 || index >= slideshowGroup.files.length) return;
+            slideshowIndex = index;
+            renderSlideshowSlide();
+        }
+
+        function slideshowPrev() {
+            if (slideshowIndex > 0) {
+                slideshowIndex--;
+                renderSlideshowSlide();
+            }
+        }
+
+        function slideshowNext() {
+            if (slideshowGroup && slideshowIndex < slideshowGroup.files.length - 1) {
+                slideshowIndex++;
+                renderSlideshowSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const slideshowOpen = document.getElementById('memorySlideshow').style.display === 'flex';
+            if (!slideshowOpen) return;
+            if (e.key === 'ArrowLeft') slideshowPrev();
+            if (e.key === 'ArrowRight') slideshowNext();
+            if (e.key === 'Escape') closeMemorySlideshow();
+        });
+
+        // --- Minigame Variables ---
+        let gameInterval;
+        let itemInterval;
+        let cairoPos = 50;
+        let score = 0;
+        let itemsCaught = 0;
+        let fallSpeed = 4; // Starting fall speed pixels per frame
+        let gameActive = false;
+        // --- Updated Minigame Logic ---
+        let itemSpawnRate = 1200; // How fast items spawn (ms)
+        let bombChance = 0.2;     // 20% initial chance
+
+        function openDialogue(key) {
+            hideGameElements();
+            document.getElementById('dialogueText').style.display = 'block';
+            document.getElementById('dialogueText').innerHTML = dialogues[key];
+            document.getElementById('dialogueOverlay').style.display = 'flex';
+        }
+
+        function openGame() {
+            document.getElementById('dialogueText').style.display = 'block';
+            document.getElementById('dialogueText').innerHTML = "🐾 <b>CAIRO'S ITEM CATCHER</b> 🐾<br>Move Cairo left and right to catch treats (🦴, 🎂). <br><br><b>AVOID BOMBS (💣)!</b> Speed increases every 5 treats!";
+            document.getElementById('dialogueOverlay').style.display = 'flex';
+            document.getElementById('miniGameScreen').style.display = 'block';
+            document.getElementById('gameControls').style.display = 'flex';
+
+            startNewGame();
+        }
+
+        function startNewGame() {
+            document.getElementById('leaderboardScreen').style.display = 'none';
+            document.querySelectorAll('.falling-item').forEach(el => el.remove());
+
+            score = 0;
+            itemsCaught = 0;
+            fallSpeed = 4;
+            itemSpawnRate = 1200;
+            bombChance = 0.2;
+            cairoPos = 50;
+            gameActive = true;
+
+            updateScoreBoard();
+            document.getElementById('gameCairo').style.left = cairoPos + "%";
+
+            clearInterval(gameInterval);
+            clearInterval(itemInterval);
+
+            // Start spawning
+            itemInterval = setInterval(spawnItem, itemSpawnRate);
+        }
+
+        function spawnItem() {
+            if (!gameActive) return;
+
+            const item = document.createElement('div');
+            item.className = 'falling-item';
+
+            // Dynamic difficulty: bomb chance increases up to 50%
+            const isBomb = Math.random() < bombChance;
+            item.innerHTML = isBomb ? '💣' : (Math.random() > 0.5 ? '🦴' : '🎂');
+            item.dataset.type = isBomb ? 'bomb' : 'treat';
+
+            const randomX = Math.floor(Math.random() * 70) + 15;
+            item.style.left = randomX + '%';
+            document.getElementById('miniGameScreen').appendChild(item);
+
+            let currY = -30;
+
+            const fall = setInterval(() => {
+                if (!gameActive) {
+                    clearInterval(fall);
+                    item.remove();
+                    return;
+                }
+                currY += fallSpeed;
+                item.style.top = currY + 'px';
+
+                if (currY >= 160 && currY <= 210) {
+                    const cairoBox = document.getElementById('gameCairo').getBoundingClientRect();
+                    const itemBox = item.getBoundingClientRect();
+
+                    if (itemBox.left < cairoBox.right && itemBox.right > cairoBox.left) {
+                        clearInterval(fall);
+                        item.remove();
+
+                        if (item.dataset.type === 'bomb') {
+                            endGame();
+                        } else {
+                            score += 10;
+                            itemsCaught++;
+
+                            // Every 5 catches: Increase speed, spawn rate, and bomb chance
+                            if (itemsCaught % 5 === 0) {
+                                fallSpeed += 1.0;
+                                bombChance = Math.min(bombChance + 0.05, 0.5); // Max 50% bomb chance
+                                itemSpawnRate = Math.max(itemSpawnRate - 100, 500); // Faster spawns, min 500ms
+
+                                // Restart interval with new rate
+                                clearInterval(itemInterval);
+                                itemInterval = setInterval(spawnItem, itemSpawnRate);
+                            }
+
+                            updateScoreBoard();
+                        }
+                    }
+                }
+
+                if (currY > 250) {
+                    clearInterval(fall);
+                    item.remove();
+                }
+            }, 40);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearInterval(itemInterval);
+
+            // Clean up falling items
+            document.querySelectorAll('.falling-item').forEach(el => el.remove());
+
+            // Ask for name and save score
+            setTimeout(() => {
+                let playerName = prompt(`BOOM! 💣 Game Over.\nYour score: ${score}\nEnter your name for the leaderboard:`, "Eirene");
+                if (!playerName) playerName = "Guest";
+
+                saveToLeaderboard(playerName, score);
+            }, 100);
+        }
+
+        function saveToLeaderboard(name, finalScore) {
+            // Get existing board from localStorage
+            let board = JSON.parse(localStorage.getItem('cairoCatchLeaderboard')) || [];
+
+            // Add new score
+            board.push({ name: name, score: finalScore });
+
+            // Sort by score descending and keep top 5
+            board.sort((a, b) => b.score - a.score);
+            board = board.slice(0, 5);
+
+            // Save back to localStorage
+            localStorage.setItem('cairoCatchLeaderboard', JSON.stringify(board));
+
+            showLeaderboardDisplay(board);
+        }
+
+        function showLeaderboardDisplay(board) {
+            let listHtml = "";
+            if (board.length === 0) {
+                listHtml = "<li>No scores yet!</li>";
+            } else {
+                board.forEach((entry, index) => {
+                    listHtml += `<li class="score-entry"><span>${index + 1}. ${entry.name}</span> <span>${entry.score} pts</span></li>`;
+                });
+            }
+
+            document.getElementById('leaderboardList').innerHTML = listHtml;
+            document.getElementById('leaderboardScreen').style.display = 'block';
+        }
+
+        function hideGameElements() {
+            gameActive = false;
+            clearInterval(itemInterval);
+            document.getElementById('miniGameScreen').style.display = 'none';
+            document.getElementById('gameControls').style.display = 'none';
+            document.getElementById('leaderboardScreen').style.display = 'none';
+            document.getElementById('farmingScreen').style.display = 'none';
+            document.querySelectorAll('.falling-item').forEach(el => el.remove());
+        }
+
+        function closeDialogue() {
+            closeMemorySlideshow();
+            hideGameElements();
+            document.getElementById('dialogueText').style.display = 'block';
+            document.getElementById('dialogueOverlay').style.display = 'none';
+        }
+
+        function moveCairoLeft() {
+            if (cairoPos > 15) cairoPos -= 10;
+            document.getElementById('gameCairo').style.left = cairoPos + "%";
+        }
+
+        function moveCairoRight() {
+            if (cairoPos < 85) cairoPos += 10;
+            document.getElementById('gameCairo').style.left = cairoPos + "%";
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+            if (e.key === 'ArrowLeft') moveCairoLeft();
+            if (e.key === 'ArrowRight') moveCairoRight();
+        });
+
+        function updateScoreBoard() {
+            document.getElementById('scoreBoard').innerText = "SCORE: " + score;
+            // Display speed multiplier based on fall speed
+            let speedDisplay = ((fallSpeed - 4) / 1.5) + 1;
+            document.getElementById('speedBoard').innerText = "SPD: " + speedDisplay + "x";
+        }
+
+        // --- Left Panel Interactions (Energy Bars & Confetti) ---
+        let woofEnergy = 50;
+        let happyEnergy = 50;
+
+        function triggerConfetti() {
+            const colors = ['#f1c40f', '#2ecc71', '#e74c3c', '#3498db', '#ff9ff3'];
+            for (let i = 0; i < 80; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti-particle');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(confetti);
+
+                // Clean up confetti particles after animation finishes
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5500);
+            }
+        }
+
+        // --- Updated Left Panel Interactions ---
+        let lastGreetingIndex = -1;
+
+        const cairoGreetings = [
+            "Woof! Happy Birthday Eirene! 🐾🎂",
+            "Eirene is the best! Happy Birthday! 🐶✨",
+            "Woof! Hope your day is as fun as an adventure! 🦴",
+            "Happy Birthday to my favorite human, Eirene! 🐾🎉",
+            "Woof! Let's celebrate Eirene's big day! 🎂🎈",
+            "You're doing great, Eirene! Woof! 🐾💖",
+            "Happy Birthday! Cairo loves you, Eirene! 🐶🥰",
+            "Woof! I want to eat some treats, Eirene! 🦴✨",
+            "Happy Birthday Eirene! Let's go on an adventure! 🐾🌿",
+            "Woof! May your dreams come true, Eirene! 🌽🎉"
+        ];
+
+        document.getElementById('cairoPet').addEventListener('click', () => {
+            // Randomize index while ensuring it's not the same as the last one
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * cairoGreetings.length);
+            } while (newIndex === lastGreetingIndex && cairoGreetings.length > 1);
+
+            lastGreetingIndex = newIndex;
+            alert(cairoGreetings[newIndex]);
+
+            // Increase energy
+            woofEnergy = Math.min(woofEnergy + 10, 100);
+            document.getElementById('woof-bar').style.width = woofEnergy + '%';
+            document.getElementById('woof-val').innerText = woofEnergy + '%';
+
+            happyEnergy = Math.min(happyEnergy + 10, 100);
+            document.getElementById('happy-bar').style.width = happyEnergy + '%';
+            document.getElementById('happy-val').innerText = happyEnergy + '%';
+
+            // Check if both reached maximum
+            if (happyEnergy === 100 && woofEnergy === 100) {
+                triggerConfetti();
+            }
+        });
+
+        // --- Energy Drain Timer ---
+        // Every 5 minutes (300,000 ms), decrease energy points by 1 (stops at 50)
+        setInterval(() => {
+            if (happyEnergy > 50) {
+                happyEnergy--;
+                document.getElementById('happy-bar').style.width = happyEnergy + '%';
+                document.getElementById('happy-val').innerText = happyEnergy + '%';
+            }
+            if (woofEnergy > 50) {
+                woofEnergy--;
+                document.getElementById('woof-bar').style.width = woofEnergy + '%';
+                document.getElementById('woof-val').innerText = woofEnergy + '%';
+            }
+        }, 300000); // 300,000 milliseconds = 5 minutes
+
+    </script>
+</body>
+
+</html>
