@@ -19,7 +19,7 @@ GitHub Actions build
         ↓
 GitHub Pages (HTTPS site with assets baked in)
         ↓
-Visitor enters password → browser compares against bcrypt hash in `auth-config.js`
+Visitor enters password → browser compares digest in `auth-config.js`
 ```
 
 Credentials stay in **GitHub Secrets**. They are used only during the ~2 minute deploy job.
@@ -28,10 +28,10 @@ Credentials stay in **GitHub Secrets**. They are used only during the ~2 minute 
 
 ```
 SITE_PASSWORD (GitHub Secret, plaintext)
-        ↓  bcrypt hash in GitHub Actions
-auth-config.js (hash only, deployed to Pages)
+        ↓  salt + SHA-256 digest in GitHub Actions
+auth-config.js (salt + digest only, deployed to Pages)
         ↓
-Browser compares typed password with hash (bcryptjs)
+Browser hashes input with Web Crypto API and compares
 ```
 
 ---
@@ -83,7 +83,7 @@ Repo: `ilona-asa/cautious-barnacle` → **Settings → Secrets and variables →
 | Name | Value |
 |------|--------|
 | `GDRIVE_SERVICE_ACCOUNT_JSON` | Paste the **entire** JSON key file contents |
-| `SITE_PASSWORD` | The farm gate password (e.g. `AI=AsaIrene`) — **never** put this in `index.html` |
+| `SITE_PASSWORD` | Your chosen farm gate password — set only in GitHub Secrets, never in code or docs |
 
 ### Variable (required)
 
@@ -130,16 +130,27 @@ No need to upload large videos to GitHub again.
 
 ---
 
+## Changing the password
+
+The live password is **only** the `SITE_PASSWORD` GitHub Secret. It is not stored in this repo.
+
+1. Repo → **Settings → Secrets and variables → Actions**
+2. Edit `SITE_PASSWORD` with your new value (no leading/trailing spaces)
+3. **Actions → Deploy GitHub Pages → Run workflow** (or push any commit to `main`)
+
+Each deploy generates a new `auth-config.js` salt and digest. Visitors who were already logged in may need to enter the new password (clear `sessionStorage` or use a private window).
+
+---
+
 ## Local development
 
 Keep `Photos-3-001/` on your machine for testing. It is gitignored.
 
-Generate a local `auth-config.js` (bcrypt hash only — not committed):
+Generate a local `auth-config.js` (not committed). Use the same value as your `SITE_PASSWORD` secret:
 
 ```bash
 cd "/Users/asa-sabsono/Documents/side project/eirene_game"
-pip install bcrypt
-SITE_PASSWORD='AI=AsaIrene' python scripts/generate_auth_config.py
+SITE_PASSWORD='your-password-here' python3 scripts/generate_auth_config.py
 python3 -m http.server 8765
 # open http://localhost:8765
 ```
@@ -158,8 +169,8 @@ python scripts/download_gdrive_assets.py
 ## Security notes
 
 - **GitHub Secrets** — never committed; only used during the Actions build.
-- **Password** — stored as `SITE_PASSWORD` secret. At deploy time, Actions hashes it with **bcrypt** and writes `auth-config.js` containing **only the hash**. The plaintext password is never in Git or in deployed HTML.
-- **Limitation** — validation still runs in the browser (GitHub Pages is static). A determined person could brute-force the bcrypt hash offline. This is much stronger than plaintext in source, but not bank-grade auth.
+- **Password** — only in `SITE_PASSWORD` GitHub Secret. Change it anytime via Settings → Secrets, then redeploy. Never commit the value to Git, docs, or `index.html`.
+- **Verification** — uses the browser Web Crypto API (no external CDN). Works reliably on GitHub Pages over HTTPS.
 - **Service account JSON** — keep in `GDRIVE_SERVICE_ACCOUNT_JSON` secret only; never commit `birthdayproject-*.json` to Git.
 - **Deployed media URLs** — direct file URLs may still work without the gate. Acceptable for a birthday gift.
 - **Private repo** — keeps code off public GitHub; Pages on private repos requires GitHub Pro.
