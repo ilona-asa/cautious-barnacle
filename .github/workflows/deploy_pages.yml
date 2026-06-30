@@ -26,8 +26,13 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Google Drive client
-        run: pip install google-api-python-client google-auth
+      - name: Install build dependencies
+        run: pip install google-api-python-client google-auth bcrypt
+
+      - name: Generate password auth config (bcrypt hash only)
+        env:
+          SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
+        run: python scripts/generate_auth_config.py
 
       - name: Download memory assets from Google Drive
         env:
