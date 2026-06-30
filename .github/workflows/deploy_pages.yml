@@ -27,9 +27,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install build dependencies
-        run: pip install google-api-python-client google-auth bcrypt
+        run: pip install google-api-python-client google-auth
 
-      - name: Generate password auth config (bcrypt hash only)
+      - name: Generate password auth config (SHA-256 digest)
         env:
           SITE_PASSWORD: ${{ secrets.SITE_PASSWORD }}
         run: python scripts/generate_auth_config.py
