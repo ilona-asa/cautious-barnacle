@@ -19,10 +19,20 @@ GitHub Actions build
         ↓
 GitHub Pages (HTTPS site with assets baked in)
         ↓
-Visitor sees password gate in browser
+Visitor enters password → browser compares against bcrypt hash in `auth-config.js`
 ```
 
 Credentials stay in **GitHub Secrets**. They are used only during the ~2 minute deploy job.
+
+### Password flow
+
+```
+SITE_PASSWORD (GitHub Secret, plaintext)
+        ↓  bcrypt hash in GitHub Actions
+auth-config.js (hash only, deployed to Pages)
+        ↓
+Browser compares typed password with hash (bcryptjs)
+```
 
 ---
 
@@ -68,11 +78,12 @@ The service account can now read files; random users cannot without your site pa
 
 Repo: `ilona-asa/cautious-barnacle` → **Settings → Secrets and variables → Actions**
 
-### Secret (required)
+### Secrets (required)
 
 | Name | Value |
 |------|--------|
 | `GDRIVE_SERVICE_ACCOUNT_JSON` | Paste the **entire** JSON key file contents |
+| `SITE_PASSWORD` | The farm gate password (e.g. `AI=AsaIrene`) — **never** put this in `index.html` |
 
 ### Variable (required)
 
@@ -123,7 +134,12 @@ No need to upload large videos to GitHub again.
 
 Keep `Photos-3-001/` on your machine for testing. It is gitignored.
 
+Generate a local `auth-config.js` (bcrypt hash only — not committed):
+
 ```bash
+cd "/Users/asa-sabsono/Documents/side project/eirene_game"
+pip install bcrypt
+SITE_PASSWORD='AI=AsaIrene' python scripts/generate_auth_config.py
 python3 -m http.server 8765
 # open http://localhost:8765
 ```
@@ -141,7 +157,9 @@ python scripts/download_gdrive_assets.py
 
 ## Security notes
 
-- **GitHub Secret** — never committed; only used in Actions.
-- **Password gate** (`AI=AsaIrene`) — casual privacy; password is visible in page source.
-- **Deployed media URLs** — anyone who passes the password can still copy direct file URLs from the slideshow. For a birthday gift this is usually acceptable.
-- **Private repo** — keeps code off public GitHub; Pages on private repos requires GitHub Pro. Public repo + no assets in Git is a common free compromise.
+- **GitHub Secrets** — never committed; only used during the Actions build.
+- **Password** — stored as `SITE_PASSWORD` secret. At deploy time, Actions hashes it with **bcrypt** and writes `auth-config.js` containing **only the hash**. The plaintext password is never in Git or in deployed HTML.
+- **Limitation** — validation still runs in the browser (GitHub Pages is static). A determined person could brute-force the bcrypt hash offline. This is much stronger than plaintext in source, but not bank-grade auth.
+- **Service account JSON** — keep in `GDRIVE_SERVICE_ACCOUNT_JSON` secret only; never commit `birthdayproject-*.json` to Git.
+- **Deployed media URLs** — direct file URLs may still work without the gate. Acceptable for a birthday gift.
+- **Private repo** — keeps code off public GitHub; Pages on private repos requires GitHub Pro.
