@@ -1,2 +1,5 @@
 .DS_Store
 Photos-3-001/
+auth-config.js
+birthdayproject-*.json
+*-service-account*.json

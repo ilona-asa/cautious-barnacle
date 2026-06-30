@@ -681,6 +681,8 @@
             box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.3);
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/umd/bcrypt.min.js"></script>
+    <script src="auth-config.js"></script>
 </head>
 
 <body>
@@ -814,12 +816,18 @@
     </div>
 
     <script>
-        const CORRECT_PASSWORD = 'AI';
+        const AUTH_SESSION_KEY = 'eireneFarmAuth';
 
         function checkPassword() {
+            const hash = window.__SITE_AUTH__?.hash;
+            if (!hash) {
+                alert('Site auth is not configured. Deploy via GitHub Actions, or run scripts/generate_auth_config.py locally.');
+                return;
+            }
+
             const input = document.getElementById('passwordInput').value;
-            if (input === CORRECT_PASSWORD) {
-                sessionStorage.setItem('eireneFarmAuth', '1');
+            if (bcrypt.compareSync(input, hash)) {
+                sessionStorage.setItem(AUTH_SESSION_KEY, '1');
                 document.getElementById('passwordGate').style.display = 'none';
             } else {
                 alert('Wrong password! Please ask Eirene for the password.');
@@ -832,7 +840,7 @@
             if (e.key === 'Enter') checkPassword();
         });
 
-        if (sessionStorage.getItem('eireneFarmAuth') === '1') {
+        if (sessionStorage.getItem(AUTH_SESSION_KEY) === '1' && window.__SITE_AUTH__?.hash) {
             document.getElementById('passwordGate').style.display = 'none';
         } else {
             document.getElementById('passwordInput').focus();
